@@ -14,7 +14,7 @@ jcGrid_c = 0.80;            jclen = length(jcGrid_c);
 
 jtotlen = j2len*j3len*jclen;
 
-eachrun = floor(Int64,jtotlen/runN);
+eachrun = round(Int64,jtotlen/runN);
 
 fid = open("autoCompare.sh", "w");
 
@@ -28,13 +28,18 @@ println(fid, "# eachrun = $eachrun");
 
 for idx = 1:runN
   sttN = 1 + (idx-1)*eachrun;
-  if idx*eachrun <= jtotlen 
-    endN = idx*eachrun;
-  else
+  if idx == runN
     endN = jtotlen;
+  else
+    endN = idx*eachrun;
   end
+  
   strstr = @sprintf("local_minima_remover_D.jl %d %d %d", sttN, endN, idx);
   println(fid, "julia_wh $strstr &");
 end
+
+println(fid, "wait");
+println(fid, "echo \"All done!\"");
+println(fid, "exit 0");
 
 close(fid)
